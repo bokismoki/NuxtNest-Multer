@@ -1,3 +1,12 @@
+const PurgecssPlugin = require('purgecss-webpack-plugin');
+const glob = require('glob-all')
+const path = require('path')
+
+class TailwindExtractor {
+  static extract(content) {
+    return content.match(/[A-z0-9-:/]+/g) || []
+  }
+}
 
 export default {
   mode: 'universal',
@@ -5,7 +14,7 @@ export default {
   ** Headers of the page
   */
   head: {
-    title: process.env.npm_package_name || '',
+    titleTemplate: '%s - Multer Image Upload',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -18,7 +27,7 @@ export default {
   /*
   ** Customize the progress-bar color
   */
-  loading: { color: '#fff' },
+  loading: false,
   /*
   ** Global CSS
   */
@@ -41,6 +50,7 @@ export default {
   */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
+    '~modules/import-tailwind.config',
     '@nuxtjs/axios',
   ],
   /*
@@ -48,6 +58,7 @@ export default {
   ** See https://axios.nuxtjs.org/options
   */
   axios: {
+    baseURL: 'http://localhost:8080/api'
   },
   /*
   ** Build configuration
@@ -56,7 +67,23 @@ export default {
     /*
     ** You can extend webpack config here
     */
-    extend (config, ctx) {
+    extractCSS: true,
+    extend(config, ctx) {
+      config.plugins.push(
+        new PurgecssPlugin({
+          whitelist: ['html', 'body'],
+          paths: glob.sync([
+            path.join(__dirname, 'components/**/*.vue'),
+            path.join(__dirname, 'layouts/**/*.vue'),
+            path.join(__dirname, 'pages/**/*.vue'),
+            path.join(__dirname, 'plugins/**/*.vue')
+          ]),
+          extractors: [{
+            extractor: TailwindExtractor,
+            extensions: ['html', 'js', 'vue']
+          }]
+        })
+      )
     }
   }
 }
