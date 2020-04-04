@@ -52,6 +52,7 @@ export default {
     // Doc: https://axios.nuxtjs.org/usage
     '~modules/import-tailwind.config',
     '@nuxtjs/axios',
+    'nuxt-lazy-load'
   ],
   /*
   ** Axios module configuration
