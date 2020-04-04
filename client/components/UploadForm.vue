@@ -11,6 +11,7 @@
       <label
         class="bg-vblue relative block w-full max-w-lg mx-auto text-white border-2 border-vblue rounded-xl mt-5 p-5 cursor-pointer shadow transition-colors duration-300 group hover:border-vgreen lg:p-8"
         for="file"
+        ref="dropZone"
       >
         <div class="text-center" v-if="!imageRendered">
           <span
@@ -74,8 +75,10 @@ export default {
   methods: {
     processFile(e) {
       this.setImageFile(e.target.files[0])
-      const img = this.$refs.image
       const file = e.target.files[0]
+      this.fileRead(file)
+    },
+    fileRead(file) {
       const reader = new FileReader()
 
       reader.addEventListener('load', () => {
@@ -133,6 +136,19 @@ export default {
         .catch(err => {
           console.error(err)
         })
+    },
+    handleDragOver(e) {
+      e.stopPropagation()
+      e.preventDefault()
+    },
+    handleFileSelect(e) {
+      e.stopPropagation()
+      e.preventDefault()
+
+      const files = e.dataTransfer.files
+      this.setImageFile(files[0])
+      const file = files[0]
+      this.fileRead(file)
     }
   },
   computed: {
@@ -147,6 +163,16 @@ export default {
     uploadCompleted() {
       return this.image.upload === 100
     }
+  },
+  mounted() {
+    const dropZone = this.$refs.dropZone
+    dropZone.addEventListener('dragover', this.handleDragOver, false)
+    dropZone.addEventListener('drop', this.handleFileSelect, false)
+  },
+  beforeDestroy() {
+    const dropZone = this.$refs.dropZone
+    dropZone.removeEventListener('dragover', this.handleDragOver, false)
+    dropZone.removeEventListener('drop', this.handleFileSelect, false)
   }
 }
 </script>
