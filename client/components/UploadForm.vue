@@ -97,7 +97,7 @@ export default {
       this.image.file = file
     },
     convertSizeToMb(size) {
-      return (size / 1000).toFixed(2)
+      return (size / (1024 * 1024)).toFixed(2)
     },
     removeImage() {
       this.image.src = ''
